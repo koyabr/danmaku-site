@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<i>
+
+    {% for danmaku in danmaku_set %}
+
+    <d p="{{ danmaku.time }},{{ danmaku.mode }},{{ danmaku.size }},{{ danmaku.color }},{{ danmaku.date }}">{{ danmaku.text }}</d>
+
+    {% endfor %}
+
+</i>

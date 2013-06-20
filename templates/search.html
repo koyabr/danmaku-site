@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Danmaku video - Home{% endblock %}
+
+
+{% block inside_css %}
+    <style type="text/css">
+        .sub-menu {
+            height: 37px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgb(231, 231, 231) rgb(231, 231, 231) rgb(223, 223, 223);
+            -moz-border-top-colors: none;
+            -moz-border-right-colors: none;
+            -moz-border-bottom-colors: none;
+            -moz-border-left-colors: none;
+            border-image: none;
+            border-radius: 7px 7px 0px 0px;
+            background-color: rgb(246, 246, 246);
+            background-image: linear-gradient(to bottom, rgb(248, 248, 248), rgb(243, 243, 243));
+            background-repeat: repeat-x;
+        }
+
+        .content-zone {
+
+            border-width: medium 1px 1px;
+            border-style: none solid solid;
+            border-color: -moz-use-text-color rgb(231, 231, 231) rgb(231, 231, 231);
+            -moz-border-top-colors: none;
+            -moz-border-right-colors: none;
+            -moz-border-bottom-colors: none;
+            -moz-border-left-colors: none;
+            border-image: none;
+            padding-top: 20px;
+        }
+
+        .block-title {
+            font-size: 22px;
+            color: rgb(37, 38, 39);
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 40px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+
+    </style>
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+
+    <div class="container-fluid sub-menu">
+        <div class="row-fluid">
+            <div class="pull-left">
+                <ul class="nav nav-tabs">
+                    <li><a href="#Home" data-toggle="tab">Home</a></li>
+                    <li><a href="#TV" data-toggle="tab">TV</a></li>
+                    <li><a href="#Movie" data-toggle="tab">Movie</a></li>
+                    <li><a href="#Cartoon" data-toggle="tab">Cartoon</a></li>
+                    <li><a href="#Course" data-toggle="tab">Course</a></li>
+                </ul>
+            </div>
+            <div class="pull-right">
+                <div class="dropdown dropdown-genre">
+                    <a class="btn btn-basic btn-select" href="#" data-toggle="dropdown">
+                        Sort by ...
+                        <i class="icon-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="sort-id">date</a></li>
+                        <li><a class="sort-id">title</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class=" container-fluid content-zone">
+
+
+
+        <div class="tab-content">
+            <div class="tab-pane" id="Home">
+
+
+            </div>
+            <div class="tab-pane" id="TV">
+
+
+            </div>
+            <div class="tab-pane" id="Movie">
+
+
+            </div>
+            <div class="tab-pane" id="Cartoon">
+
+            </div>
+            <div class="tab-pane" id="Course">
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+        $(document).ready(function () {
+
+            if ($('.tab-pane.active').attr("id") == undefined) {
+                $('#Home').addClass("active");
+                $('#Home').load(
+                        "/ajax/posts/",
+                        {category: '', sort: 'date'},
+                        function (responseText, textStatus, XMLHttpRequest) {
+                            $(this).html(responseText);
+                        });
+
+
+            }
+
+            $('.nav-tabs li a').click(function () {
+
+
+                var href = $(this).attr("href");
+                var anchor = href.substring(href.indexOf('#') + 1);
+
+
+                $(".tab-pane").each(function () {
+                    if ($(this).attr("id") == anchor) {
+                        $(this).addClass("active");
+                        $(this).load(
+                                "/ajax/posts/",
+                                {category: anchor, sort: 'date'},
+                                function (responseText, textStatus, XMLHttpRequest) {
+                                    $(this).html(responseText);
+                                });
+                    }
+                });
+
+
+            });
+
+            $('.sort-id').click(function () {
+
+                var sort = $(this).text();
+
+                var category = $(".tab-pane.active").attr("id");
+
+                $(".tab-pane.active").load(
+                        "/ajax/posts/",
+                        {category: category, sort: sort},
+                        function (responseText, textStatus, XMLHttpRequest) {
+                            $(this).html(responseText);
+                        });
+
+            });
+        });
+    </script>
+
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Danmaku video - Home{% endblock %}
+
+
+{% block content %}
+
+    <div class="container-fluid block-menu">
+        <div class="row-fluid">
+            <div class="pull-left">
+                <ul class="nav nav-tabs">
+                    <li><a href="#Home" data-toggle="tab"><i class="icon-home"></i> Home</a></li>
+                    <li><a href="#TV" data-toggle="tab">TV</a></li>
+                    <li><a href="#Movie" data-toggle="tab">Movie</a></li>
+                    <li><a href="#Cartoon" data-toggle="tab">Cartoon</a></li>
+                    <li><a href="#Course" data-toggle="tab">Course</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group pull-right">
+                <button id="sort-btn" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                    Sort by <i class="icon-chevron-down"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="sort-id">date</a></li>
+                    <li><a class="sort-id">title</a></li>
+                </ul>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class=" container-fluid block-content">
+
+
+        <div class="tab-content">
+            <div class="tab-pane" id="Home">
+
+
+            </div>
+            <div class="tab-pane" id="TV">
+
+
+            </div>
+            <div class="tab-pane" id="Movie">
+
+
+            </div>
+            <div class="tab-pane" id="Cartoon">
+
+            </div>
+            <div class="tab-pane" id="Course">
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+
+        window['search_query'] = '';
+        window['after_search'] = false;
+        window['sort'] = 'date';
+
+        function search() {
+
+
+            window['search_query'] = $('#search_query').val();
+
+            $(".tab-pane.active").load(
+                    "/ajax/search/",
+                    {
+                        search_query: window['search_query'],
+                        sort: window['sort']
+                    },
+                    function (responseText) {
+                        $(this).html(responseText);
+                    });
+
+            window['after_search'] = true;
+
+            $('.nav-tabs li.active').removeClass("active");
+
+        }
+
+        function load_pane() {
+            var category = $(".tab-pane.active").attr("id");
+            $('.tab-pane.active').load(
+                    "/ajax/posts/",
+                    {
+                        category: category,
+                        sort: window['sort']
+                    },
+                    function (responseText) {
+                        $(this).html(responseText);
+                        $('.carousel').carousel();
+                    });
+
+            setTimeout(function () {
+
+            }, 100);
+
+
+        }
+
+
+        $(document).ready(function () {
+
+            $('.nav-tabs li:first').addClass('active');
+            $('#Home').addClass("active");
+
+            // Are we jump here to search?
+
+            if ($('#search_query').val() != '')
+                search();
+
+            else
+                load_pane();
+
+
+            $('.nav-tabs li a').click(function () {
+
+                setTimeout(function () {
+                    load_pane();
+
+                }, 100);
+
+                window['after_search'] = false;
+
+
+            });
+
+            $('.sort-id').click(function () {
+
+                window['sort'] = $(this).text();
+                $('#sort-btn').text('Sort by ' + window['sort']);
+
+                if (window['after_search'])
+                    search();
+                else
+                    load_pane();
+
+
+            });
+        });
+    </script>
+
+
+{% endblock %}

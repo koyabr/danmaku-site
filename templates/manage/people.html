@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Danmaku video - Manage People{% endblock %}
+
+
+{% block content %}
+
+
+    <div class="container-fluid block-menu">
+        <div class="row-fluid">
+            <div class="pull-left">
+                <ul class="nav nav-tabs">
+                    <li><a href="#Following" data-toggle="tab"> Following</a></li>
+                    <li><a href="#Followed" data-toggle="tab"> Followed</a></li>
+
+
+                </ul>
+
+            </div>
+
+
+            <div class="btn-group pull-right">
+
+                <button id="sort-btn" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                    Sort by <i class="icon-chevron-down"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="sort-id">username</a></li>
+                </ul>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <div class=" container-fluid block-content">
+
+
+        <div class="tab-content">
+            <div class="tab-pane" id="Following">
+
+
+            </div>
+            <div class="tab-pane" id="Followed">
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="following-modal" class="modal hide fade" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 class="modal-title">I am following</h3>
+        </div>
+        <div class="modal-body" id="modal-body-following">
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" data-dismiss="modal">Close</button>
+            <button class="btn btn-danger" id="btn-unfollow">Unfollow</button>
+        </div>
+    </div>
+
+    <div id="followed-modal" class="modal hide fade" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 class="modal-title">I am followed by</h3>
+        </div>
+        <div class="modal-body" id="modal-body-followed">
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+
+
+
+    <script>
+
+
+        window['sort'] = 'username';
+
+
+        function load_pane() {
+            var category = $(".tab-pane.active").attr("id");
+            $('.tab-pane.active').load(
+                    "/ajax/people/",
+                    {
+                        category: category,
+                        sort: window['sort'],
+                    },
+                    function (responseText) {
+                        $(this).html(responseText);
+                        $('.carousel').carousel();
+
+
+                        $('.people-link').click(function () {
+
+                            var people_name = $(this).attr("title");
+                            var people_id = $(this).attr("people-id");
+
+                            $('.modal-title').text(people_name);
+
+
+                            $('.modal-body').load(
+                                    "/ajax/profile/",
+                                    {people_id: people_id},
+                                    function (data) {
+                                        $(this).html(data);
+                                    }
+                            );
+
+                            $('#btn-unfollow').click(function () {
+
+                                $.post("/ajax/follow/",
+                                        {target_id: people_id});
+
+                            });
+
+
+                        });
+
+
+                    });
+
+
+        }
+
+        $(document).ready(function () {
+
+            // Load the panes
+
+            $('.nav-tabs li:first').addClass('active');
+            $('#Following').addClass("active");
+            load_pane();
+
+            $('.nav-tabs li a').click(function () {
+
+                setTimeout(function () {
+                    load_pane();
+
+                }, 100);
+
+
+            });
+
+
+            $('.sort-id').click(function () {
+
+                window['sort'] = $(this).text();
+                $('#sort-btn').text('Sort by ' + window['sort']);
+
+                load_pane();
+
+
+            });
+
+
+            $('.modal').on('hidden', function () {
+                load_pane();
+            })
+
+
+        });
+    </script>
+
+
+{% endblock %}

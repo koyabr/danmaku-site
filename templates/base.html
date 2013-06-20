@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang='en' xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+
+    {% load staticfiles %}
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap/css/bootstrap-responsive.min.css' %}" rel="stylesheet">
+    <link href="{% static 'my.css' %}" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+
+
+    {% block inside_css %}{% endblock %}
+
+</head>
+<body>
+
+<div id="header" class="navbar navbar-fixed-top ">
+    <div class="navbar-inner">
+        <div class="container">
+            <ul class="nav">
+                <li>
+                    <div>
+                        <a href="{% url 'home' %}">
+                            <button class="btn btn-primary">Danmaku Video</button>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="divider-vertical"></li>
+
+                <li>
+
+                    <div class="input-append" style="margin-top: 5px">
+                        <input type="text" id="search_query" value="{% if query %} {{ query }}{% endif %}">
+                        <button id="search_submit" class="btn btn-success"><i class="icon-search"></i></button>
+                    </div>
+
+                </li>
+            </ul>
+
+
+            <div class="btn-group pull-right">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+
+                    <img id="avatar"
+                         src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&s=18"/>
+                    {% if request.user.is_authenticated %}
+                        {{ request.user.username }}
+                    {% else %}
+                        tourist
+                    {% endif %}
+                    <i class="icon-chevron-down"></i>
+                </button>
+
+                <ul class="dropdown-menu">
+
+                    {% if request.user.is_authenticated %}
+                        <li><a href="{% url 'manage_posts' %}"><i class="icon-book"></i> My Posts</a></li>
+                        <li><a href="{% url 'manage_people' %}"><i class="icon-user"></i> My People</a></li>
+                        <li><a href="{% url 'logout' %}"><i class="icon-off"></i> Log out</a></li>
+                    {% else %}
+
+                        <li><a href="{% url 'login' %}"><i class="icon-arrow-up"></i> Log in</a></li>
+                        <li><a href="{% url 'register' %}"><i class="icon-plus-sign"></i> Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% block content %}{% endblock %}
+
+
+<script>
+
+
+    $(document).ready(function () {
+
+
+
+        $.getJSON("/ajax/user/", function (json) {
+
+            $("#avatar").attr("src", "http://www.gravatar.com/avatar/" + json.email_hash + "?s=18&d=mm");
+        });
+
+        function search() {
+            query = $('#search_query').val();
+
+            if (query != '')
+                window.location.href = "/?q=" + $('<div/>').text(query).html();
+
+        }
+
+
+        $('#search_submit').click(function () {
+            search();
+
+        });
+        $('#search_query').keydown(function (event) {
+            if (event.which == 13) {
+                search();
+
+            }
+
+        });
+
+
+    });
+</script>
+
+</body>
+</html>

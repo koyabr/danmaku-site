@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Danmaku video - Manage Posts{% endblock %}
+
+
+{% block content %}
+
+
+
+    <div class="container-fluid block-menu">
+        <div class="row-fluid">
+            <div class="pull-left">
+                <ul class="nav nav-tabs">
+                    <li><a href="#Home" data-toggle="tab"><i class="icon-home"></i> Home</a></li>
+                    <li><a href="#TV" data-toggle="tab">TV</a></li>
+                    <li><a href="#Movie" data-toggle="tab">Movie</a></li>
+                    <li><a href="#Cartoon" data-toggle="tab">Cartoon</a></li>
+                    <li><a href="#Course" data-toggle="tab">Course</a></li>
+                    <li><a href="#Favorite" data-toggle="tab" class="label"><i class="icon-heart"></i> Favorite</a></li>
+                </ul>
+
+            </div>
+
+
+            <div class="btn-group pull-right">
+
+                <button class="btn btn-info" data-toggle="modal" data-target="#publish-modal">
+                    <i class="icon-pencil"></i> New Post
+                </button>
+
+                <button id="sort-btn" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                    Sort by <i class="icon-chevron-down"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="sort-id">date</a></li>
+                    <li><a class="sort-id">title</a></li>
+                </ul>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <div class=" container-fluid block-content">
+
+
+        <div class="tab-content">
+            <div class="tab-pane" id="Home">
+
+
+            </div>
+            <div class="tab-pane" id="TV">
+
+
+            </div>
+            <div class="tab-pane" id="Movie">
+
+
+            </div>
+            <div class="tab-pane" id="Cartoon">
+
+            </div>
+            <div class="tab-pane" id="Course">
+
+
+            </div>
+            <div class="tab-pane" id="Favorite">
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="publish-modal" class="modal hide fade" tabindex="-1" data-remote="/post/publish/">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="modal-title-publish">Add a post</h3>
+        </div>
+        <div class="modal-body" id="modal-body-publish">
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" data-dismiss="modal">Close</button>
+            <button class="btn btn-primary" id="btn-publish">Publish</button>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="modal hide fade" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="modal-title-edit">Edit a post</h3>
+        </div>
+        <div class="modal-body" id="modal-body-edit">
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" data-dismiss="modal">Close</button>
+            <button class="btn btn-primary" id="btn-save">Save</button>
+        </div>
+    </div>
+
+
+
+    <script>
+
+        window['search_query'] = '';
+        window['after_search'] = false;
+        window['sort'] = 'date';
+
+        function search() {
+
+
+            window['search_query'] = $('#search_query').val();
+
+            $(".tab-pane.active").load(
+                    "/ajax/search/",
+                    {
+                        search_query: window['search_query'],
+                        sort: window['sort'],
+                        personal: true
+                    },
+                    function (responseText) {
+                        $(this).html(responseText);
+                    });
+
+            window['after_search'] = true;
+
+            $('.nav-tabs li.active').removeClass("active");
+
+        }
+
+        function load_pane() {
+            var category = $(".tab-pane.active").attr("id");
+            $('.tab-pane.active').load(
+                    "/ajax/posts/",
+                    {
+                        category: category,
+                        sort: window['sort'],
+                        personal: true
+                    },
+                    function (responseText) {
+                        $(this).html(responseText);
+                        $('.carousel').carousel();
+                        if (category.toLowerCase() != 'favorite') {
+
+
+                            var post_id;
+                            $('.lab-footer').each(function () {
+
+                                post_id = $(this).attr("post-id");
+
+                                $(this).after('<button class="btn btn-link btn-edit" data-toggle="modal" data-target="#edit-modal" post-id="' + post_id + '">Edit</button>');
+
+
+                            });
+
+                            $('.btn-edit').click(function () {
+
+                                var post_id = $(this).attr("post-id");
+
+
+                                $('#modal-body-edit').load(
+                                        "/post/" + post_id + "/edit/",
+                                        function (data) {
+                                            $(this).html(data);
+                                        }
+                                );
+
+                                $('#btn-save').click(function () {
+
+                                    $.post("/post/" + post_id + "/edit/",
+                                            $('#form-edit').serialize(),
+                                            function (data) {
+                                                $('#modal-body-edit').html(data);
+
+
+                                            });
+
+                                });
+
+
+                            });
+
+
+                        }
+                    });
+
+
+        }
+
+        $(document).ready(function () {
+
+            // Load the home pane
+
+            $('.nav-tabs li:first').addClass('active');
+            $('#Home').addClass("active");
+            load_pane();
+
+
+            $('.nav-tabs li a').click(function () {
+
+                setTimeout(function () {
+                    load_pane();
+
+                }, 100);
+
+                window['after_search'] = false;
+
+
+            });
+
+            $('.sort-id').click(function () {
+
+                window['sort'] = $(this).text();
+                $('#sort-btn').text('Sort by ' + window['sort']);
+
+                if (window['after_search'])
+                    search();
+                else
+                    load_pane();
+
+
+            });
+
+            $('#btn-publish').click(function () {
+
+                $.post('/post/publish/',
+                        $('#form-publish').serialize(),
+                        function (data) {
+                            $('#modal-body-publish').html(data);
+                            //$('#publish-modal').modal('hide')
+
+                        });
+
+            });
+
+
+            $('.modal').on('hidden', function () {
+                load_pane();
+            })
+
+
+        });
+    </script>
+
+
+{% endblock %}

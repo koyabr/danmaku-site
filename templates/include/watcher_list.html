@@ -1,0 +1,40 @@
+<h2 class="post-aside-title">
+    Watching this video ({{ watcher_list|length }})
+</h2>
+
+{% if watcher_list %}
+
+    <div id="myCarousel" class="carousel slide">
+    <ol class="carousel-indicators">
+        {% for page in watcher_list %}
+            {% ifequal forloop.counter0 0 %}
+                <li class="active" data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}"></li>
+            {% else %}
+                <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}"></li>
+            {% endifequal %}
+        {% endfor %}
+    </ol>
+    <!-- Carousel items -->
+    <div class="carousel-inner">
+        {% for page in watcher_list %}
+            {% ifequal forloop.counter0 0 %}
+                <div class="active item">
+            {% else %}
+                <div class="item">
+            {% endifequal %}
+
+        {% for watcher in page %}
+            <div class="span2">
+
+                <img class="img-circle" title="{{ watcher.username }}"
+                     src="http://www.gravatar.com/avatar/{{ watcher.userinfo.hash }}?s=30&d=mm">
+            </div>
+        {% endfor %}
+
+        </div>
+        {% endfor %}
+        </div>
+        <!-- Carousel nav -->
+    </div>
+
+{% endif %}

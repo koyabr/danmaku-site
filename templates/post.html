@@ -1,0 +1,313 @@
+
+
+{% extends 'base.html' %}
+
+{% block title %}Danmaku video - Post{% endblock %}
+
+{% block content %}
+    <div class="container" id="main" target="{{ post.id }}">
+
+        <div class="container-fluid">
+
+            {% if post.vid %}
+                {% load staticfiles %}
+                <embed id="MukioPlayer"
+                       src="{% static 'MukioPlayerPlus.swf' %}?vid={{ post.vid }}&type=video&sort=new"
+                       type="application/x-shockwave-flash" allowscriptaccess="always" quality="high"
+                       allowfullscreen="true"
+                       height="490" width="100%"/>
+            {% endif %}
+
+
+        </div>
+        <div class="container-fluid content-zone">
+            <div class="row-fluid">
+
+                <div class="span4 post-left-col">
+
+                    <div id="post-info">
+                        <div class="post-pic wrapper">
+                            <img width="150" height="150" src="{{ post.img }}">
+                        </div>
+                        {% if request.user.is_authenticated %}
+                            <div class="row-fluid wrapper">
+                                <div class="pull-left" style="margin-right: 10px">
+
+
+                                    {% if post in request.user.userinfo.like.all %}
+                                        <button id="unlike" class="btn btn-danger btn-like">
+                                            Unlike
+                                        </button>
+                                    {% else %}
+                                        <button id="like" class="btn btn-info btn-like">
+                                            Like
+                                        </button>
+                                    {% endif %}
+
+                                </div>
+                                <div class="pull-right">
+
+
+                                    {% if post in request.user.userinfo.favorite.all %}
+                                        <button id="remove" class="btn btn-danger btn-fav">
+                                            Remove from favorites
+                                        </button>
+                                    {% else %}
+                                        <button id="add" class="btn btn-info btn-fav">
+                                            Add to favorites
+                                        </button>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="post-digest wrapper ">
+
+
+                            <h4>{{ post.title }}</h4>
+
+                            <p>
+                                {{ post.text }}
+                            </p>
+                        </div>
+
+
+                        <ul class="breadcrumb post-numbers wrapper">
+
+                            <li><strong>{{ post.play_num }}</strong><br> plays<span class="divider">/</span></li>
+
+                            <li><strong id="num-like">{{ post.like.all|length }}</strong><br> likes<span
+                                    class="divider">/</span></li>
+
+                            <li><strong id="num-fav">{{ post.favorite.all|length }}</strong><br> favorites<span
+                                    class="divider">/</span></li>
+
+
+                        </ul>
+
+
+                    </div>
+                    <div class="container-fluid" id="watcher-list">
+
+                    </div>
+
+                    <div class="container-fluid">
+
+                        <h2 class="post-aside-title">Post Author</h2>
+
+
+                        <div class="row-fluid">
+                            <div class="span3">
+                                <img class="img-circle"
+                                     src="http://www.gravatar.com/avatar/{{ post.author.userinfo.hash }}?s=45&d=mm">
+
+                            </div>
+                            <div class="span3">
+                                {% if request.user.is_authenticated %}
+                                    {% ifnotequal request.user post.author %}
+                                        {% if post.author in request.user.userinfo.follow.all %}
+                                            <button id="unfollow" class="btn btn-follow btn-danger"
+                                                    target="{{ post.author.id }}">Unfollow
+                                            </button>
+                                        {% else %}
+                                            <button id="follow" class="btn btn-follow btn-success"
+                                                    target="{{ post.author.id }}">Follow
+                                            </button>
+                                        {% endif %}
+
+
+                                    {% endifnotequal %}
+                                {% else %}
+                                    <span class="label label-success">Register to follow!</span>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span3">
+                                <span class="badge">{{ post.author.username }} </span>
+                            </div>
+                            <div class="span3">
+
+
+                            <span id="lab-follow"
+                                  class="label label-info">{{ post.author.follow.all|length }} followers</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+                <div class="span8 post-right-col">
+
+                    <div id="disqus_thread"></div>
+                    <script type="text/javascript">
+                        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                        var disqus_shortname = 'danmaku'; // required: replace example with your forum shortname
+                        var disqus_identifier = {{  post.id }};
+                        /* * * DON'T EDIT BELOW THIS LINE * * */
+                        (function () {
+                            var dsq = document.createElement('script');
+                            dsq.type = 'text/javascript';
+                            dsq.async = true;
+                            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                        })();
+                    </script>
+                    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments
+                        powered by Disqus.</a></noscript>
+                    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span
+                            class="logo-disqus">Disqus</span></a>
+
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+
+
+        $(document).ready(function () {
+
+
+            var post_id = $('#main').attr('target');
+
+            // Add to watching list
+            $.post(
+                    "/ajax/watcher/",
+                    {post_id: post_id, type: 1}
+            );
+
+            // Remove from watching list
+            $(window).on('beforeunload', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/ajax/watcher/",
+                    data: {post_id: post_id, type: 0},
+                    async: false
+                });
+
+            });
+
+
+            // polling the watching list
+
+            function doPoll() {
+                $('#watcher-list').load(
+                        "/ajax/watcher/",
+                        {post_id: post_id},
+                        function (responseText) {
+
+                            $(this).html(responseText);
+                            $('.carousel').carousel();
+                            setTimeout(doPoll, 2000);
+                        });
+            }
+
+            doPoll();
+
+
+            $('.btn-follow').click(function () {
+
+
+                if ($(this).attr("id") == "follow") {
+                    $(this).attr("id", "unfollow");
+                    $(this).text("Unfollow");
+                    $(this).removeClass("btn-success");
+                    $(this).addClass("btn-danger");
+                } else {
+                    $(this).attr("id", "follow");
+                    $(this).text("Follow");
+                    $(this).removeClass("btn-danger");
+                    $(this).addClass("btn-success");
+                }
+
+
+                var target_id = $(this).attr("target");
+                $.post("/ajax/follow/",
+                        {target_id: target_id},
+                        function (json) {
+                            $('#lab-follow').text(json.follow_num + " followers");
+                        },
+                        'json');
+            });
+
+            $('.btn-like').click(function () {
+
+
+                if ($(this).attr("id") == "like") {
+                    $(this).attr("id", "unlike");
+                    $(this).text("Unlike");
+                    $(this).removeClass("btn-info");
+                    $(this).addClass("btn-danger");
+                } else {
+                    $(this).attr("id", "like");
+                    $(this).text("Like");
+                    $(this).removeClass("btn-danger");
+                    $(this).addClass("btn-info");
+                }
+
+                $.post("/ajax/like/",
+                        {post_id: post_id},
+                        function (json) {
+                            $('#num-like').text(json.like_num);
+                        },
+                        'json');
+            });
+
+            $('.btn-fav').click(function () {
+
+
+                if ($(this).attr("id") == "add") {
+                    $(this).attr("id", "remove");
+                    $(this).text("Remove from favorites");
+                    $(this).removeClass("btn-info");
+                    $(this).addClass("btn-danger");
+                } else {
+                    $(this).attr("id", "add");
+                    $(this).text("Add to favorites");
+                    $(this).removeClass("btn-danger");
+                    $(this).addClass("btn-info");
+                }
+
+                $.post("/ajax/favorite/",
+                        {post_id: post_id},
+                        function (json) {
+                            $('#num-fav').text(json.fav_num);
+                        },
+                        'json');
+            });
+
+            function search() {
+
+                var query = $('#search_query').val();
+
+                $(".tab-pane.active").load(
+                        "/ajax/search/",
+                        {search_query: query, sort: window['sort']},
+                        function (responseText) {
+                            $(this).html(responseText);
+                        });
+
+                $('.nav-tabs li.active').removeClass("active");
+
+            }
+
+
+            $('#search_submit').click(search);
+            $('#search_query').keydown(function (event) {
+                if (event.which == 13)
+                    search();
+            });
+        });
+    </script>
+
+
+{% endblock %}

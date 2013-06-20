@@ -1,0 +1,43 @@
+<li class="span4">
+
+
+    <div class="thumbnail">
+
+        <div class="media">
+
+            <div class="brief-pic pull-left">
+                <a href="{% url 'post' post.id %}">
+                    <img class="img-rounded" src="{{ post.img }}">
+                </a>
+            </div>
+
+            <div class="media-body">
+                <a href="{% url 'post' post.id %}">
+                    <strong title="{{ post.title }}">{{ post.title|truncatechars:"15" }}</strong>
+                </a>
+
+
+
+                {% if post.text %}
+                    <p title="{{ post.text }}">{{ post.text|truncatechars:"15" }}</p>
+                {% endif %}
+
+                <div>
+                    <span>
+                    <i class="icon-play-circle"></i> {{ post.play_num }}
+                    <i class="icon-thumbs-up"></i> {{ post.like.all|length }}
+                    <i class="icon-heart"></i> {{ post.favorite.all|length }}
+                    </span>
+                    <span class="label lab-footer label-inverse" post-id="{{ post.id }}">{{ post.date }}</span>
+                </div>
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+</li>
+

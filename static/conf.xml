@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<conf>
+  <performance>
+    <!-- pixels -->
+    <maxwidth>2048</maxwidth>
+    <!-- pixels -->
+    <maxheight>768</maxheight>
+    <!-- Capacity -->
+    <maxonstage>120</maxonstage>
+    <!-- Capacity (with effects) -->
+    <maxwitheffect>80</maxwitheffect>
+  </performance>
+  <server>
+    <!-- Do not change -->
+    <onhost>yes</onhost>
+    <!-- Source of comments -->
+    <load>comment/{$id}</load>
+    <!-- Address to which post comments -->
+    <send>comment/{$id}</send>
+    <!-- Gateway for post -->
+    <gateway></gateway>
+  </server>
+</conf>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Danmaku video - Login{% endblock %}
+
+
+
+{% block content %}
+    <div class="wrapper">
+
+        <form action="" method="post">
+
+            <legend>Please log in</legend>
+
+            {% include "include/forms.html" %}
+
+            <button class="btn btn-large btn-primary" type="submit">Log in</button>
+            <input type="hidden" name="next" value="{% url 'home' %}"/>
+
+
+        </form>
+    </div>
+
+{% endblock %}
