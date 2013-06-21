@@ -23,18 +23,23 @@
                 <div class="item">
             {% endifequal %}
 
-        {% for watcher in page %}
-            <div class="span2">
+        <ul class="container-fluid">
 
-                <img class="img-circle" title="{{ watcher.username }}"
-                     src="http://www.gravatar.com/avatar/{{ watcher.userinfo.hash }}?s=30&d=mm">
-            </div>
-        {% endfor %}
+            {% for watcher in page %}
+                <div class="span4">
+
+                    <img class="img-circle" title="{{ watcher.username }}"
+                         src="http://www.gravatar.com/avatar/{{ watcher.userinfo.hash }}?s=50&d=mm">
+                </div>
+            {% endfor %}
+        </ul>
 
         </div>
         {% endfor %}
         </div>
         <!-- Carousel nav -->
+        <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+        <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
     </div>
 
 {% endif %}

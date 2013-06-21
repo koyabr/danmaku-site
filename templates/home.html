@@ -11,7 +11,7 @@
                 <ul class="nav nav-tabs">
                     <li><a href="#Home" data-toggle="tab"><i class="icon-home"></i> Home</a></li>
                     <li><a href="#TV" data-toggle="tab">TV</a></li>
-                    <li><a href="#Movie" data-toggle="tab">Movie</a></li>
+                    <li><a href="#Game" data-toggle="tab">Game</a></li>
                     <li><a href="#Cartoon" data-toggle="tab">Cartoon</a></li>
                     <li><a href="#Course" data-toggle="tab">Course</a></li>
                 </ul>
@@ -44,7 +44,7 @@
 
 
             </div>
-            <div class="tab-pane" id="Movie">
+            <div class="tab-pane" id="Game">
 
 
             </div>
@@ -62,12 +62,14 @@
 
 
 
-    <script>
+    <script type="text/javascript">
 
         window['search_query'] = '';
         window['after_search'] = false;
         window['sort'] = 'date';
 
+
+        // Fetch query string from input, reload current active tab-pane with search result
         function search() {
 
 
@@ -79,8 +81,8 @@
                         search_query: window['search_query'],
                         sort: window['sort']
                     },
-                    function (responseText) {
-                        $(this).html(responseText);
+                    function (data) {
+                        $(this).html(data);
                     });
 
             window['after_search'] = true;
@@ -89,6 +91,7 @@
 
         }
 
+        // Reload current active tab-pane
         function load_pane() {
             var category = $(".tab-pane.active").attr("id");
             $('.tab-pane.active').load(
@@ -97,16 +100,10 @@
                         category: category,
                         sort: window['sort']
                     },
-                    function (responseText) {
-                        $(this).html(responseText);
+                    function (data) {
+                        $(this).html(data);
                         $('.carousel').carousel();
                     });
-
-            setTimeout(function () {
-
-            }, 100);
-
-
         }
 
 
@@ -123,7 +120,7 @@
             else
                 load_pane();
 
-
+            // Click to switch tabs
             $('.nav-tabs li a').click(function () {
 
                 setTimeout(function () {
@@ -135,6 +132,8 @@
 
 
             });
+
+            // Change sort-seed and reload the tab-pane
 
             $('.sort-id').click(function () {
 

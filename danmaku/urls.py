@@ -1,8 +1,16 @@
 from django.conf.urls import patterns, include, url
 
-# Uncomment the next two lines to enable the admin:
+
 from django.contrib import admin
 admin.autodiscover()
+
+'''
+@author: koyabr
+@contact: koyabr@gmail.com
+
+'''
+
+
 
 urlpatterns = patterns('',
 
@@ -34,7 +42,7 @@ urlpatterns = patterns('',
     url(r'^post/(?P<post_id>\d+)/edit/$', 'danmaku.views.edit', name='edit'),
 
     # reserved for flash player
-    url(r'^post/(?P<post_id>\d+)/danmaku/(?P<vid>\d+)/$', 'danmaku.views.danmaku', name='danmaku'),
+    url(r'^post/(?P<post_id>\d+)/danmaku/(?P<vid>\d+)/?$', 'danmaku.views.danmaku', name='danmaku'),
 
 
 
@@ -54,7 +62,7 @@ urlpatterns = patterns('',
     url(r'^ajax/watcher/$', 'danmaku.ajax.watcher', name='ajax_watcher'),
     url(r'^ajax/like/$', 'danmaku.ajax.like', name='ajax_like'),
     url(r'^ajax/favorite/$', 'danmaku.ajax.favorite', name='ajax_favorite'),
-        # search
+    # search
     url(r'^ajax/search/$', 'danmaku.ajax.search', name='ajax_search'),
 
 

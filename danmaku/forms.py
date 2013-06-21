@@ -2,18 +2,24 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
-from danmaku.models import Post, Comment
+
+from danmaku.models import Post
+
+'''
+@author: koyabr
+@contact: koyabr@gmail.com
+
+'''
 
 
 class MyUserCreationForm(UserCreationForm):
+    '''
+    Extend the UserCreationForm to add email field.
+    '''
 
-    username = forms.RegexField(label=_("Username"), max_length=30,
-                                regex=ur'^[0-9A-Za-z\u4e00-\u9fa5]+$',
-                                help_text=_("Required. 30 characters or fewer. Letters, digits and Hanzi only."),
-                                error_messages={
-                                    'invalid': _("This value may contain only letters, numbers and Hanzi.")})
+
     email = forms.EmailField(label=_("Email"), max_length=254,
-                             help_text=_("Required. Avatar service is delivered by Gravatar."))
+                             help_text=_("Required. Avatar service delivered by Gravatar; comment service powered by Disqus."))
 
 
     class Meta:
@@ -39,12 +45,10 @@ class MyUserCreationForm(UserCreationForm):
 
 
 class PostForm(forms.ModelForm):
+    '''
+    ModelForm for a Post.
+    '''
     class Meta:
         model = Post
-        fields = ['title', 'category', 'text', 'vid', 'img']
+        fields = ['title', 'category', 'vid', 'img', 'text']
 
-
-class CommentForm(forms.ModelForm):
-    class Meta:
-        model = Comment
-        fields = ['body']

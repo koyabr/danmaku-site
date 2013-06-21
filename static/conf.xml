@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Danmaku player configuration -->
 <conf>
   <performance>
     <!-- pixels -->
@@ -14,9 +15,9 @@
     <!-- Do not change -->
     <onhost>yes</onhost>
     <!-- Source of comments -->
-    <load>comment/{$id}</load>
+    <load>danmaku/{$id}</load>
     <!-- Address to which post comments -->
-    <send>comment/{$id}</send>
+    <send>danmaku/{$id}</send>
     <!-- Gateway for post -->
     <gateway></gateway>
   </server>

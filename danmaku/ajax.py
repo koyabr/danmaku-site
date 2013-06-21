@@ -1,34 +1,59 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.http import HttpResponse
 from django.template import RequestContext
-from django.core.urlresolvers import reverse
-
+from django.shortcuts import render_to_response, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-
-from danmaku.models import Post, UserInfo
 from django.contrib.auth.models import User
 from django.db.models import Q
+
+from danmaku.models import Post
 
 import re
 import json
 
+'''
+@author: koyabr
+@contact: koyabr@gmail.com
 
-def split_list(post_list, page_len=3):
-    # split a list of posts into pages
+'''
+
+
+def split_list(origin_list, page_len=3):
+    '''
+    A toolkit method.
+    Divide a long list into separate pages,
+    very useful in multi-pages & carousel.
+
+    @param origin_list: The list to be split
+    @param page_len: How many items in a page
+
+    @return: A list of pages
+    '''
+
     page_list = []
     i = 0
-    while i + page_len <= len(post_list):
-        page_list.append(post_list[i:i + 3])
-        i += 3
+    while i + page_len <= len(origin_list):
+        page_list.append(origin_list[i:i + page_len])
+        i += page_len
 
-    if i < len(post_list):
-        page_list.append(post_list[i:])
+    if i < len(origin_list):
+        page_list.append(origin_list[i:])
 
     return page_list
 
 
+@login_required()
 def user(request):
-# Get hash for user's email
+    '''
+    Accept any request and return current user's info.
+    Currently only yields the email_hash.
+
+    @param request: Any types of http request
+
+    @return: Currrent user's info in JSON format
+
+    '''
+
     email_hash = ""
     if request.user.is_authenticated():
         email_hash = request.user.userinfo.hash
@@ -38,11 +63,20 @@ def user(request):
     return HttpResponse(json.dumps(user_json))
 
 
+@login_required()
 @csrf_exempt
 def follow(request):
+    '''
+    Add a user to / Remove a user from current user's follow list.
+    A user cannot follow himself.
+
+    @param request: A POST request with an user_id
+
+    @return: The number of target user's followers in JSON format
+    '''
     follow_json = {}
-    if 'target_id' in request.POST:
-        author = get_object_or_404(User, id=request.POST['target_id'])
+    if 'user_id' in request.POST:
+        author = get_object_or_404(User, id=request.POST['user_id'])
         if author in request.user.userinfo.follow.all():
             request.user.userinfo.follow.remove(author)
         elif author != request.user:
@@ -52,8 +86,16 @@ def follow(request):
     return HttpResponse(json.dumps(follow_json))
 
 
+@login_required()
 @csrf_exempt
 def like(request):
+    '''
+    Add a post to / Remove a post from current user's like list.
+
+    @param request: A POST request with a post_id
+
+    @return: How many users like the post, in JSON format
+    '''
     like_json = {}
     if 'post_id' in request.POST:
         post = get_object_or_404(Post, id=request.POST['post_id'])
@@ -66,8 +108,16 @@ def like(request):
     return HttpResponse(json.dumps(like_json))
 
 
+@login_required()
 @csrf_exempt
 def favorite(request):
+    '''
+    Add a post to / Remove a post from current user's favorite list.
+
+    @param request: A POST request with a post_id
+
+    @return: How many users add the post to favorite, in JSON format
+    '''
     fav_json = {}
     if 'post_id' in request.POST:
         post = get_object_or_404(Post, id=request.POST['post_id'])
@@ -82,11 +132,19 @@ def favorite(request):
 
 @csrf_exempt
 def watcher(request):
+    '''
+    1. Declare that current user start/stop watching the post.
+    2. Provide polling for current watcher list of the post.
+
+    @param request: A POST request with a post_id
+
+    @return: A rendered html showing current watcher list
+    '''
     watcher_list = []
     if 'post_id' in request.POST:
         post = get_object_or_404(Post, id=request.POST['post_id'])
 
-        if 'type' in request.POST:
+        if 'type' in request.POST and request.user.is_authenticated():
             type = request.POST['type']
 
             if type == '0':
@@ -110,7 +168,18 @@ def watcher(request):
 
 @csrf_exempt
 def posts(request):
-    # Sort the posts
+    '''
+    Return list of posts to current user,
+    if the user is authenticated, he can fetch the posts he has published.
+
+    @param request: A POST request with three optional key-values.
+                    1. category: What kinds of posts
+                    2. sort: How the posts are sorted
+                    3. personal: If fetch posts published by current user
+
+    @return: A rendered html showing result post list
+    '''
+
     sort = 'date'
     category = ''
     personal = ''
@@ -125,8 +194,8 @@ def posts(request):
         sort = 'date'
     if category == 'tv':
         category = 't'
-    elif category == 'movie':
-        category = 'm'
+    elif category == 'game':
+        category = 'g'
     elif category == 'cartoon':
         category = 'c'
     elif category == 'course':
@@ -170,27 +239,28 @@ def posts(request):
         }, context_instance=RequestContext(request))
 
 
+@login_required()
 @csrf_exempt
 def people(request):
+    '''
+    Return a list of following/followed users to current user.
+
+    @param request: A POST request with a category (following/followed)
+
+    @return: A rendered html showing result user list
+    '''
     people_list = []
 
-    sort = 'name'
     category = 'following'
-    if 'sort' in request.POST:
-        sort = request.POST['sort'].lower()
     if 'category' in request.POST:
         category = request.POST['category'].lower()
 
-    if sort != 'name':
-        sort = 'name'
     if category != 'following' and category != 'followed':
         category = 'following'
 
     if category == 'following':
-
         people_list = request.user.userinfo.follow.all()
     else:
-
         info_list = request.user.follow.all()
         for info in info_list:
             people_list.append(info.user)
@@ -205,22 +275,19 @@ def people(request):
 
 @csrf_exempt
 def profile(request):
+    '''
+    Return a list pf posts published by target user.
 
-    people_id = 0
+    @param request: A POST request with an user_id
+
+    @return: A rendered html showing result post list
+    '''
+    post_list = []
     sort = 'date'
 
-    if 'sort' in request.POST:
-        sort = request.POST['sort'].lower()
-    if 'people_id' in request.POST:
-        people_id = request.POST['people_id'].lower()
-
-    if sort != 'date' and sort != 'title':
-        sort = 'date'
-
-    author = get_object_or_404(User, id=people_id)
-
-    post_list = Post.objects.filter(author=author).order_by('-'+sort)
-
+    if 'user_id' in request.POST:
+        author = get_object_or_404(User, id=request.POST['user_id'])
+        post_list = Post.objects.filter(author=author).order_by('-' + sort)
 
     page_list = split_list(post_list, 9)
 
@@ -228,8 +295,18 @@ def profile(request):
         'page_list': page_list,
     }, context_instance=RequestContext(request))
 
+
 @csrf_exempt
 def search(request):
+    '''
+    Search for posts in their titles and text notes.
+
+    @param request: A POST request with the query string
+
+    @return: A rendered html showing result post list
+
+
+    '''
     post_list = None
     print request.POST
     if ('search_query' in request.POST) and request.POST['search_query'].strip():
@@ -259,6 +336,15 @@ def search(request):
 
 
 def get_query(search_query, search_fields):
+    '''
+    A toolkit method.
+    Generate filters using query string and search fields.
+
+    @param search_query: The query string from users
+    @param search_fields: Which fields of post we should look up in
+
+    @return: query filters for Post.objects.filter()
+    '''
     find_terms = re.compile(r'"([^"]+)"|(\S+)').findall
     norm_space = re.compile(r'\s{2,}').sub
 

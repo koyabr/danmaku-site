@@ -8,27 +8,13 @@
 
     <div class="container-fluid block-menu">
         <div class="row-fluid">
-            <div class="pull-left">
-                <ul class="nav nav-tabs">
-                    <li><a href="#Following" data-toggle="tab"> Following</a></li>
-                    <li><a href="#Followed" data-toggle="tab"> Followed</a></li>
+
+            <ul class="nav nav-tabs">
+                <li><a href="#Following" data-toggle="tab"> Following</a></li>
+                <li><a href="#Followed" data-toggle="tab"> Followed</a></li>
 
 
-                </ul>
-
-            </div>
-
-
-            <div class="btn-group pull-right">
-
-                <button id="sort-btn" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
-                    Sort by <i class="icon-chevron-down"></i>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="sort-id">username</a></li>
-                </ul>
-
-            </div>
+            </ul>
 
 
         </div>
@@ -82,19 +68,14 @@
 
 
 
-    <script>
-
-
-        window['sort'] = 'username';
-
+    <script type="text/javascript">
 
         function load_pane() {
             var category = $(".tab-pane.active").attr("id");
             $('.tab-pane.active').load(
                     "/ajax/people/",
                     {
-                        category: category,
-                        sort: window['sort'],
+                        category: category
                     },
                     function (responseText) {
                         $(this).html(responseText);
@@ -111,7 +92,7 @@
 
                             $('.modal-body').load(
                                     "/ajax/profile/",
-                                    {people_id: people_id},
+                                    {user_id: people_id},
                                     function (data) {
                                         $(this).html(data);
                                     }
@@ -120,7 +101,9 @@
                             $('#btn-unfollow').click(function () {
 
                                 $.post("/ajax/follow/",
-                                        {target_id: people_id});
+                                        {user_id: people_id});
+
+                                $('#following-modal').modal('hide');
 
                             });
 
@@ -152,18 +135,8 @@
             });
 
 
-            $('.sort-id').click(function () {
-
-                window['sort'] = $(this).text();
-                $('#sort-btn').text('Sort by ' + window['sort']);
-
-                load_pane();
-
-
-            });
-
-
-            $('.modal').on('hidden', function () {
+            // In case someone are unfollowed
+            $('#following-modal').on('hidden', function () {
                 load_pane();
             })
 
