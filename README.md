@@ -9,16 +9,19 @@ To compile and run the codes, you need:
 - django-1.5.1
 - python-2.7
 
->Note:
->1. In the `settings.py`, set `DEBUG=True` in order to
+> Note:
 >
->       python manage.py runserver
->2. If you'd like to start with an empty database
+> 1. In the `settings.py`, set `DEBUG=True` in order to
 >
->       rm danmaku.db 
->       python manage.py syncdb
+>   `python manage.py runserver`
+>
+> 2. If you'd like to start with an empty database
+>
+>   `rm danmaku.db`  
+>   `python manage.py syncdb`
+
 >3. There are two accounts in `danmaku.db`, the (username, passwd) pairs are:
->
+
 >- (koyabr, 123)
 >- (tc, 123)
 
@@ -67,6 +70,7 @@ The sitemap is quite simple:
     - vid (sina video)
     - thumbnail (external link)
     - text notes (optional, leave blank as you like)
+    
     >Note: to add a sina video, you should provide its vid instead of pure url. 
     >
     >Find videos from http://you.video.sina.com.cn/c or upload your video to sina server.
