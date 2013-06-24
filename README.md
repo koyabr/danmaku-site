@@ -35,7 +35,6 @@ Now generate documents by:
     make clean
     make
 
-**Please email me if you run into any trouble when deploying the site. I've removed any third-party packages from my design to achieve best compatibility, but anything unexpected may happen, so please contact me before judgement, thanks.**
 
 2. Website Guide
 -------------------
