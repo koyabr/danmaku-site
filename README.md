@@ -80,7 +80,7 @@ The sitemap is quite simple:
 
 ###For all users (members&tourists):
 
-- The extra comment board below the flash player in every post is powered by Disqus, you must register ay their site or use a google/facebook/twitter account in order to comment. 
+- The extra comment board below the flash player in every post is powered by Disqus, you must register at their site or use a google/facebook/twitter account in order to comment. 
 - Take it easy, the danmaku comment system is independent for use without any registration.
 
 
@@ -103,6 +103,6 @@ The sitemap is quite simple:
 
     http://www.disqus.com
     
-**Thanks to all developers for making it ful of joy to design&build a website.**
+**Thanks to all developers for making it full of joy to design&build a website.**
 
 
