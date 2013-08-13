@@ -108,7 +108,9 @@ ROOT_URLCONF = 'danmaku.urls'
 WSGI_APPLICATION = 'danmaku.wsgi.application'
 
 
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), '..', 'templates').replace('\\','/'),)
+TEMPLATE_DIRS = (
+    os.path.join(os.path.dirname(__file__), '..', 'templates').replace('\\','/'),
+    )
 
 INSTALLED_APPS = (
     'django.contrib.auth',
